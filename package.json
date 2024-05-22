@@ -1,0 +1,52 @@
+{
+  "name": "exzi-case-study-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "start": "node dist/index.js",
+    "build": "npx tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/cors": "^2.8.17",
+    "@types/crypto-js": "^4.2.2",
+    "@types/express": "^4.17.21",
+    "@types/jsonwebtoken": "^9.0.6",
+    "@types/lodash": "^4.17.4",
+    "@types/node": "^20.12.12",
+    "@types/node-rsa": "^1.1.4",
+    "@types/uuid": "^9.0.8",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^5.0.2",
+    "@truffle/hdwallet-provider": "^2.1.15",
+    "bcrypt": "^5.1.1",
+    "bs58": "^5.0.0",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "crypto-js": "^4.2.0",
+    "dayjs": "^1.11.11",
+    "dotenv": "^16.4.5",
+    "ethereumjs-util": "^7.1.5",
+    "ethers": "^6.12.1",
+    "express": "^4.19.2",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
+    "mongoose": "^8.4.0",
+    "node-rsa": "^1.1.1",
+    "truffle": "^5.11.5",
+    "ts-node-dev": "^2.0.0",
+    "uuid": "^9.0.1",
+    "web3": "^4.8.0",
+    "winston": "^3.13.0",
+    "zod": "^3.23.8"
+  }
+}
