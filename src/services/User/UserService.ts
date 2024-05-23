@@ -129,18 +129,10 @@ class UserService {
     return user;
   };
 
-  saveWalletToUser = async (
-    userId: string,
-    walletId: string,
-    walletType: string
-  ) => {
+  saveWalletToUser = async (userId: string, walletId: string) => {
     const user = await this.findUserByID(userId);
 
-    if (walletType === "ethereum") {
-      user.ethereumWallet = walletId;
-    } else if (walletType === "bitcoin") {
-      user.bitcoinWallet = walletId;
-    }
+    user.ethereumWallet = walletId;
 
     await user.save();
   };

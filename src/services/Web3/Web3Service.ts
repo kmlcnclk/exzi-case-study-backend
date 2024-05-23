@@ -1,5 +1,4 @@
 import Web3, { Bytes, EthExecutionAPI, SupportedProviders } from "web3";
-import erc20ContractArtifact from "../../contracts/Erc20Token.json";
 import HDWalletProvider from "@truffle/hdwallet-provider";
 import { IErc20 } from "./IErc20";
 import CustomError from "../../helpers/errors/CustomError";
@@ -15,7 +14,8 @@ export default class Erc20Token implements IErc20 {
     network: string,
     contractAddress: string,
     privateKey: string,
-    account: string
+    account: string,
+    contractABI: any
   ) {
     const currentNetwork = this.whichNetwork(network);
 
@@ -27,22 +27,31 @@ export default class Erc20Token implements IErc20 {
     }) as SupportedProviders<EthExecutionAPI>;
     this._web3 = new Web3(provider);
 
-    this._contract = new this._web3.eth.Contract(
-      erc20ContractArtifact.abi,
-      contractAddress
-    );
+    this._contract = new this._web3.eth.Contract(contractABI, contractAddress);
 
     this._contractAddress = contractAddress;
     this._privateKey = privateKey;
     this._account = account;
   }
 
+  balanceOf(address: string): Promise<object> {
+    throw new Error("Method not implemented.");
+  }
+
   private whichNetwork(network: string) {
+    const NODE_ENV = process.env.NODE_ENV;
+
     switch (network.toLowerCase()) {
+      case "bsc":
+        return NODE_ENV === "production"
+          ? process.env.INFURA_BSC_PROVIDER
+          : process.env.INFURA_BSC_TESTNET_PROVIDER;
       case "eth":
-        return process.env.INFURA_ETHEREUM_TESTNET_PROVIDER;
+        return NODE_ENV === "production"
+          ? process.env.INFURA_ETHEREUM_PROVIDER
+          : process.env.INFURA_ETHEREUM_TESTNET_PROVIDER;
       default:
-        return process.env.INFURA_ETHEREUM_TESTNET_PROVIDER;
+        return process.env.INFURA_BSC_TESTNET_PROVIDER;
     }
   }
 
@@ -50,59 +59,8 @@ export default class Erc20Token implements IErc20 {
     return this._contract.methods.totalSupply().call();
   }
 
-  async balanceOf(address: string): Promise<{
-    balance: number;
-    tokenName: string;
-    tokenSymbol: string;
-  }> {
-    const balance = await this._contract.methods.balanceOf(address).call();
-
-    const { tokenName, tokenSymbol } = await this.getTokenNameAndSymbol();
-
-    return {
-      tokenName,
-      tokenSymbol,
-      balance: Number(balance) / 10 ** 18,
-    };
-  }
-
-  async getTokenNameAndSymbol(): Promise<{
-    tokenName: string;
-    tokenSymbol: string;
-  }> {
-    const tokenName = await this._contract.methods.name().call();
-    const tokenSymbol = await this._contract.methods.symbol().call();
-
-    return {
-      tokenName,
-      tokenSymbol,
-    };
-  }
-
   async owner() {
     return this._contract.methods.owner().call();
-  }
-
-  async getTransactions() {
-    let datas = [];
-    const logs = await this._contract.getPastEvents({
-      event: "allEvents",
-      fromBlock: "earliest",
-      toBlock: "latest",
-    });
-
-    for (let i = 0; i < logs.length; i++) {
-      let data: any = {};
-      data["transactionHash"] = logs[i].transactionHash;
-      const t = await this._web3.eth.getTransaction(logs[i].transactionHash);
-      data["from"] = t.from;
-      data["to"] = t.to;
-      const bn = await this._web3.eth.getBlock(t.blockNumber);
-
-      data["age"] = Math.floor(Date.now() / 1000) - Number(bn.timestamp);
-      datas.push(data);
-    }
-    return datas;
   }
 
   async approve(spender: string, amount: number) {
@@ -147,7 +105,7 @@ export default class Erc20Token implements IErc20 {
         signedTransaction.rawTransaction
       );
     } catch (err: any) {
-      if (err.error.message.indexOf("insufficient funds") != -1) {
+      if (err.error.message.includes("insufficient funds")) {
         throw new CustomError("Web3 JS Error", "Insufficient funds", 500);
       } else {
         throw new CustomError("Web3 JS Error", err.error.message, 500);
@@ -202,7 +160,7 @@ export default class Erc20Token implements IErc20 {
         signedTransaction.rawTransaction
       );
     } catch (err: any) {
-      if (err.error.message.indexOf("insufficient funds") != -1) {
+      if (err.error.message.includes("insufficient funds")) {
         throw new CustomError("Web3 JS Error", "Insufficient funds", 500);
       } else {
         throw new CustomError("Web3 JS Error", err.error.message, 500);
@@ -210,7 +168,7 @@ export default class Erc20Token implements IErc20 {
     }
   }
 
-  public async transfer(to: string, amount: number): Promise<void> {
+  public async transfer(to: string, amount: number): Promise<Bytes> {
     try {
       const tokenAmount = Web3.utils.toBigInt(
         Web3.utils.toWei(String(amount), "ether")
@@ -219,48 +177,6 @@ export default class Erc20Token implements IErc20 {
       const transferTx = this._contract.methods.transfer(to, tokenAmount);
 
       const data = transferTx.encodeABI();
-
-      const tx = {
-        to: this._contractAddress,
-        from: this._account,
-        data: data,
-      } as any;
-
-      const gas = await this._web3.eth.estimateGas(tx);
-      const gasPrice = await this._web3.eth.getGasPrice();
-      const nonce = await this._web3.eth.getTransactionCount(this._account);
-
-      tx.gas = this._web3.utils.toHex(gas);
-      tx.gasPrice = this._web3.utils.toHex(gasPrice);
-      tx.nonce = this._web3.utils.toHex(nonce);
-
-      const signedTransaction = await this._web3.eth.accounts.signTransaction(
-        tx,
-        this._privateKey
-      );
-
-      await this._web3.eth.sendSignedTransaction(
-        signedTransaction.rawTransaction
-      );
-    } catch (err: any) {
-      if (err.error.message.indexOf("insufficient funds") != -1) {
-        throw new CustomError("Web3 JS Error", "Insufficient funds", 500);
-      } else {
-        throw new CustomError("Web3 JS Error", err.error.message, 500);
-      }
-    }
-  }
-
-  public async transferForClaim(to: string, amount: number): Promise<Bytes> {
-    try {
-      const tokenAmount = Web3.utils.toBigInt(
-        Web3.utils.toWei(String(amount), "ether")
-      );
-
-      const transferTx = this._contract.methods.transfer(to, tokenAmount);
-
-      const data = transferTx.encodeABI();
-
       const tx = {
         to: this._contractAddress,
         from: this._account,
@@ -283,10 +199,9 @@ export default class Erc20Token implements IErc20 {
       const { transactionHash } = await this._web3.eth.sendSignedTransaction(
         signedTransaction.rawTransaction
       );
-
       return transactionHash;
     } catch (err: any) {
-      if (err?.error?.message.indexOf("insufficient funds") != -1) {
+      if (err.error.message.includes("insufficient funds")) {
         throw new CustomError("Web3 JS Error", "Insufficient funds", 500);
       } else {
         throw new CustomError("Web3 JS Error", err.error.message, 500);

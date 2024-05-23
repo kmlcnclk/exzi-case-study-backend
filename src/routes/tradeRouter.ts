@@ -2,6 +2,8 @@ import express, { Router } from "express";
 import { checkJwtAndUserExist } from "../middlewares/Jwt";
 import TradeController from "../controllers/tradeController";
 import UserDAO from "../data/UserDAO";
+import validate from "../middlewares/validateResource";
+import { buyTradeSchema } from "../schemas/tradeSchema";
 
 class TradeRouter {
   tradeRouter: Router;
@@ -12,7 +14,7 @@ class TradeRouter {
     this.tradeRouter = express.Router();
     this.routes();
   }
-// burada galiba ethereum ve bitcoin alım satımı yapılıyor
+
   routes() {
     this.buy();
     this.sell();
@@ -22,7 +24,7 @@ class TradeRouter {
   buy() {
     this.tradeRouter.post(
       "/buy",
-      [checkJwtAndUserExist(UserDAO)],
+      [validate(buyTradeSchema), checkJwtAndUserExist(UserDAO)],
       this.tradeController.buy
     );
   }
@@ -36,7 +38,7 @@ class TradeRouter {
   }
 
   history() {
-    this.tradeRouter.post(
+    this.tradeRouter.get(
       "/history",
       [checkJwtAndUserExist(UserDAO)],
       this.tradeController.history

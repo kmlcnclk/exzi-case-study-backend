@@ -4,8 +4,8 @@ import { RequestWithUser } from "../types/express";
 import logger from "../logger";
 import { get } from "lodash";
 import CustomError from "../helpers/errors/CustomError";
-import TokenService from "../services/Token/TokenService";
-import ethers from "ethers";
+import { WalletDocument } from "../models/walletModel";
+
 class WalletController {
   walletService: WalletService;
 
@@ -19,8 +19,6 @@ class WalletController {
     next: NextFunction
   ) => {
     try {
-      const walletData: { type: string } = req.body;
-
       // TODO: bunu middleware e yaz
       const wallet = await this.walletService.findWalletByUserId(
         get(req.user, "_id") as string
@@ -42,8 +40,7 @@ class WalletController {
 
       this.walletService.saveWalletToUser(
         get(req.user, "_id") as string,
-        walletId,
-        walletData.type
+        walletId
       );
 
       logger.info("Wallet successfully created");
@@ -61,8 +58,64 @@ class WalletController {
     }
   };
 
-  withdraw = async (req: RequestWithUser, res: Response) => {
+  withdraw = async (
+    req: RequestWithUser,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
+      const { amount, to, network, token } = req.body;
+
+      const wallet: WalletDocument =
+        (await this.walletService.findWalletByUserId(
+          get(req.user, "_id") as string
+        )) as WalletDocument;
+      console.log(1);
+      if (!wallet)
+        throw next(new CustomError("Not Found", "Wallet not found", 404));
+      console.log(1);
+
+      const privateDecrypt =
+        await this.walletService.decryptHashedWalletPrivateKey(
+          wallet.privateKey
+        );
+      console.log(1);
+
+      const result = await this.walletService.withdraw(
+        amount,
+        privateDecrypt,
+        to,
+        wallet.address,
+        network,
+        token
+      );
+      console.log(amount, privateDecrypt, to, wallet.address, network, token);
+
+      if (
+        result === "0x" ||
+        result === "" ||
+        result === null ||
+        result === undefined
+      )
+        throw next(
+          new CustomError(
+            "Internal Server Error",
+            "Withdraw is not successful",
+            500
+          )
+        );
+
+      await this.walletService.createWithdraw(
+        get(req.user, "_id") as string,
+        wallet?._id as string,
+        result as string
+      );
+
+      logger.info("Withdraw successfully completed");
+
+      return res.status(200).json({
+        message: "Withdraw successfully completed",
+      });
     } catch (err: any) {
       if (err.status) {
         return res.status(err.status).json({
@@ -82,40 +135,21 @@ class WalletController {
     }
   };
 
-  balance = async (req: RequestWithUser, res: Response) => {
+  balance = async (req: RequestWithUser, res: Response, next: NextFunction) => {
     try {
       const userID = get(req.user, "_id") as string;
 
       const wallet = await this.walletService.findWalletByUserId(userID);
 
-      const { ethereumBalance, usdcBalanceOnEthereum, usdtBalanceOnEthereum } =
-        await this.walletService.getAllBalancesForEthereum(
-          wallet?.address as string
-        );
+      if (!wallet)
+        throw next(new CustomError("Not Found", "Wallet not found", 404));
 
-      const {
-        binanceBalance,
-        ethBalanceOnBinance,
-        usdcBalanceOnBinance,
-        usdtBalanceOnBinance,
-      } = await this.walletService.getAllBalancesForBinance(
-        wallet?.address as string
-      );
-      console.log(1);
+      const { binance, ethereum } = await this.walletService.balance(wallet);
 
       return res.status(200).json({
         balances: {
-          ethereum: {
-            ethereumBalance,
-            usdcBalanceOnEthereum,
-            usdtBalanceOnEthereum,
-          },
-          binance: {
-            binanceBalance,
-            ethBalanceOnBinance,
-            usdcBalanceOnBinance,
-            usdtBalanceOnBinance,
-          },
+          ethereum,
+          binance,
         },
       });
     } catch (err: any) {

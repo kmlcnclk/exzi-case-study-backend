@@ -16,10 +16,6 @@ const userSchema = new mongoose.Schema(
     name: { type: String, required: true },
     password: { type: String, required: true },
     ethereumWallet: { type: mongoose.Schema.Types.ObjectId, ref: "Wallet" },
-    bitcoinWallet: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Wallet",
-    },
     resetPasswordToken: {
       type: String,
     },

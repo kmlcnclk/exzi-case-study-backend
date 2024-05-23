@@ -29,6 +29,11 @@ export default class BaseDAO<T extends Document> {
     return result.map((r) => r.toObject() as T);
   }
 
+  public async findAllWithProperty(props: any): Promise<T[]> {
+    const result: T[] = await this.model.find(props).exec();
+    return result.map((r) => r.toObject() as T);
+  }
+
   public async remove(where: FilterQuery<T>): Promise<boolean> {
     const result = await this.model.deleteOne(where).exec();
     return result.deletedCount === 1;

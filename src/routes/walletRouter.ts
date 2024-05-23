@@ -2,6 +2,8 @@ import express, { Router } from "express";
 import WalletController from "../controllers/walletController";
 import { checkJwtAndUserExist } from "../middlewares/Jwt";
 import UserDAO from "../data/UserDAO";
+import validate from "../middlewares/validateResource";
+import { withdrawWalletSchema } from "../schemas/walletSchema";
 
 class WalletRouter {
   walletRouter: Router;
@@ -39,7 +41,7 @@ class WalletRouter {
   withdraw() {
     this.walletRouter.post(
       "/withdraw",
-      [checkJwtAndUserExist(UserDAO)],
+      [validate(withdrawWalletSchema), checkJwtAndUserExist(UserDAO)],
       this.walletController.withdraw
     );
   }
