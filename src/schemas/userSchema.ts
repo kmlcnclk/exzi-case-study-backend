@@ -48,60 +48,10 @@ export const changePasswordSchema = object({
   }),
 });
 
-export const editUserSchema = object({
-  body: object({
-    name: string({}).optional(),
-    email: string({}).email("Not a valid email").optional(),
-  }),
-});
-
-export const getBalanceWeb3Schema = object({
-  query: object({
-    networkName: string({}),
-  }),
-});
-
-export const searchUserSchema = object({
-  body: object({
-    email: string({
-      required_error: "Email is required",
-    }).email("Not a valid email"),
-  }),
-});
-
-export const signUpUserWithGoogleSchema = object({
-  body: object({
-    name: string({
-      required_error: "Name is required",
-    }),
-    email: string({
-      required_error: "Email is required",
-    }).email("Not a valid email"),
-  }),
-});
-
-export const signInUserWithGoogleSchema = object({
-  body: object({
-    email: string({
-      required_error: "Email is required",
-    }).email("Not a valid email"),
-  }),
-});
-
-export const changeDefaultWalletSchema = object({
-  query: object({
-    id: string({
-      required_error: "Wallet id is required",
-    }),
-  }),
-});
-
 export type CreateUserInput = Omit<
   TypeOf<typeof createUserSchema>,
   "body.passwordConfirmation"
 >;
-
-export type searchUserInput = Omit<TypeOf<typeof searchUserSchema>, "">;
 
 export const forgotPasswordSchema = object({
   body: object({

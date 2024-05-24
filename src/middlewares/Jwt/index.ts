@@ -36,7 +36,7 @@ export const checkJwtAndUserExist = <T extends typeof UserDAO>(dao: T) => {
         );
 
         if (expired)
-          throw new CustomError("Bad Request", "JWT Token Expired", 400);
+          throw new CustomError("Unauthorized Error", "JWT Token Expired", 401);
 
         const userId = get(decoded, "_id");
         if (userId) {
@@ -47,7 +47,8 @@ export const checkJwtAndUserExist = <T extends typeof UserDAO>(dao: T) => {
             return next();
           } else throw new CustomError("Not Found", "User Not Found", 404);
         } else throw new CustomError("Not Found", "User Not Found", 404);
-      } else throw new CustomError("Bad Request", "JWT Token Not Found", 400);
+      } else
+        throw new CustomError("Unauthorized Error", "JWT Token Not Found", 401);
     } catch (err: any) {
       if (err.status) {
         logger.error({

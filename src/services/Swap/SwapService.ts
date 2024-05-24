@@ -212,6 +212,7 @@ class SwapService {
         uniswapRouterABI,
         wallet
       );
+
       const amountOutMin = 0;
       const path = [from, to];
       const toAddress = wallet.address;

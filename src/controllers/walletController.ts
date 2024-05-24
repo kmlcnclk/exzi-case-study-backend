@@ -19,7 +19,6 @@ class WalletController {
     next: NextFunction
   ) => {
     try {
-      // TODO: bunu middleware e yaz
       const wallet = await this.walletService.findWalletByUserId(
         get(req.user, "_id") as string
       );

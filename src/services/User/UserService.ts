@@ -68,7 +68,11 @@ class UserService {
 
     const isValid = await user.comparePassword(password);
     if (!isValid)
-      throw new CustomError("Bad Request", "Password is not correct", 400);
+      throw new CustomError(
+        "Unauthorized Error",
+        "Password is not correct",
+        401
+      );
 
     return omit(user.toJSON(), "password") as UserDocument;
   }
