@@ -162,7 +162,7 @@ The system is built using Node version v20.11.1.
     ```
 2. Install dependencies:
     ```bash
-    cd crypto-transaction-system
+    cd exzi-case-study-backend
     npm install
     ```
 3. Run the application:
