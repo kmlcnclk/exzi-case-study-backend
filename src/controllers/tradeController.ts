@@ -24,8 +24,7 @@ class TradeController {
         get(req.user, "_id") as string
       );
 
-      if (!wallet)
-        throw next(new CustomError("Not Found", "Wallet not found", 404));
+      if (!wallet) throw new CustomError("Not Found", "Wallet not found", 404);
 
       const receipt = await this.tradeService.buyAndSellCoin(
         get(req.user, "_id") as string,
@@ -35,8 +34,10 @@ class TradeController {
       );
 
       if (!receipt)
-        throw next(
-          new CustomError("Internal Server Error", "Transaction failed", 500)
+        throw new CustomError(
+          "Internal Server Error",
+          "Transaction failed",
+          500
         );
 
       this.tradeService.createBuyTradeHistory(

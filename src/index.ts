@@ -34,7 +34,7 @@ app.use(
 app.use(
   rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 200,
+    max: 300,
   })
 );
 
@@ -42,7 +42,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
 app.use(MainRouter.mainRouter);
-app.use(customErrorHandler);
+// app.use(customErrorHandler);
 
 app.listen(PORT, () => {
   console.log(`App listening at http://localhost:${PORT}`);

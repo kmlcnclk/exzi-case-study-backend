@@ -13,20 +13,14 @@ class WalletController {
     this.walletService = new WalletService();
   }
 
-  createWallet = async (
-    req: RequestWithUser,
-    res: Response,
-    next: NextFunction
-  ) => {
+  createWallet = async (req: RequestWithUser, res: Response) => {
     try {
       const wallet = await this.walletService.findWalletByUserId(
         get(req.user, "_id") as string
       );
 
       if (wallet?._id)
-        throw next(
-          new CustomError("Bad Request", "Wallet already exists", 400)
-        );
+        throw new CustomError("Bad Request", "Wallet already exists", 400);
 
       const { address, hashOfPrivateKey } =
         await this.walletService.createWallets();
@@ -70,8 +64,7 @@ class WalletController {
           get(req.user, "_id") as string
         )) as WalletDocument;
 
-      if (!wallet)
-        throw next(new CustomError("Not Found", "Wallet not found", 404));
+      if (!wallet) throw new CustomError("Not Found", "Wallet not found", 404);
 
       const privateDecrypt =
         await this.walletService.decryptHashedWalletPrivateKey(
@@ -93,12 +86,10 @@ class WalletController {
         result === null ||
         result === undefined
       )
-        throw next(
-          new CustomError(
-            "Internal Server Error",
-            "Withdraw is not successful",
-            500
-          )
+        throw new CustomError(
+          "Internal Server Error",
+          "Withdraw is not successful",
+          500
         );
 
       await this.walletService.createWithdraw(
@@ -137,8 +128,7 @@ class WalletController {
 
       const wallet = await this.walletService.findWalletByUserId(userID);
 
-      if (!wallet)
-        throw next(new CustomError("Not Found", "Wallet not found", 404));
+      if (!wallet) throw new CustomError("Not Found", "Wallet not found", 404);
 
       const { binance, ethereum } = await this.walletService.balance(wallet);
 
@@ -158,21 +148,17 @@ class WalletController {
     }
   };
 
-  getWalletByUserId = async (
-    req: RequestWithUser,
-    res: Response,
-    next: NextFunction
-  ) => {
+  getWalletByUserId = async (req: RequestWithUser, res: Response) => {
     try {
       const wallet = await this.walletService.findWalletByUserId(
         get(req.user, "_id") as string
       );
 
-      if (!wallet)
-        throw next(new CustomError("Not Found", "Wallet not found", 404));
+      if (!wallet?._id)
+        throw new CustomError("Not Found", "Wallet not found", 404);
 
       return res.status(200).json({
-        walletAddress: wallet.address,
+        walletAddress: wallet?.address,
       });
     } catch (err: any) {
       if (err.status) {
