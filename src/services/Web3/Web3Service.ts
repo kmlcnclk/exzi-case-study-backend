@@ -105,10 +105,22 @@ export default class Erc20Token implements IErc20 {
         signedTransaction.rawTransaction
       );
     } catch (err: any) {
-      if (err.error.message.includes("insufficient funds")) {
-        throw new CustomError("Web3 JS Error", "Insufficient funds", 500);
+      if (
+        err?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("exceeds balance")
+      ) {
+        throw new CustomError(
+          "Insufficient Funds Error",
+          "Your balance is not enough to make this transaction",
+          500
+        );
       } else {
-        throw new CustomError("Web3 JS Error", err.error.message, 500);
+        throw new CustomError(
+          "Blockchain JS Error",
+          err?.message || err?.error?.message,
+          500
+        );
       }
     }
   }
@@ -160,10 +172,22 @@ export default class Erc20Token implements IErc20 {
         signedTransaction.rawTransaction
       );
     } catch (err: any) {
-      if (err.error.message.includes("insufficient funds")) {
-        throw new CustomError("Web3 JS Error", "Insufficient funds", 500);
+      if (
+        err?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("exceeds balance")
+      ) {
+        throw new CustomError(
+          "Insufficient Funds Error",
+          "Your balance is not enough to make this transaction",
+          500
+        );
       } else {
-        throw new CustomError("Web3 JS Error", err.error.message, 500);
+        throw new CustomError(
+          "Blockchain JS Error",
+          err?.message || err?.error?.message,
+          500
+        );
       }
     }
   }
@@ -201,10 +225,22 @@ export default class Erc20Token implements IErc20 {
       );
       return transactionHash;
     } catch (err: any) {
-      if (err.error.message.includes("insufficient funds")) {
-        throw new CustomError("Web3 JS Error", "Insufficient funds", 500);
+      if (
+        err?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("exceeds balance")
+      ) {
+        throw new CustomError(
+          "Insufficient Funds Error",
+          "Your balance is not enough to make this transaction",
+          500
+        );
       } else {
-        throw new CustomError("Web3 JS Error", err.error.message, 500);
+        throw new CustomError(
+          "Blockchain JS Error",
+          err?.message || err?.error?.message,
+          500
+        );
       }
     }
   }

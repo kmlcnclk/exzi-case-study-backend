@@ -155,14 +155,28 @@ class EthereumService {
         return receipt?.hash;
       return false;
     } catch (err: any) {
-      if (err.message.includes("insufficient funds")) {
+      if (
+        err?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("exceeds balance")
+      ) {
         throw new CustomError(
           "Insufficient Funds Error",
           "Your balance is not enough to make this transaction",
           500
         );
+      } else if (err.message.includes("too many decimal")) {
+        throw new CustomError(
+          "Small Amount Error",
+          "The amount is too small to make this transaction",
+          500
+        );
       } else {
-        throw new CustomError("Blockchain JS Error", err.message, 500);
+        throw new CustomError(
+          "Blockchain JS Error",
+          err?.message || err?.error?.message,
+          500
+        );
       }
     }
   };
@@ -196,17 +210,36 @@ class EthereumService {
         await tx.wait();
 
         if (tx.from === from) return tx.hash;
-      }
-      return false;
-    } catch (err: any) {
-      if (err.message.includes("insufficient funds")) {
+      } else {
         throw new CustomError(
           "Insufficient Funds Error",
           "Your balance is not enough to make this transaction",
           500
         );
+      }
+    } catch (err: any) {
+      if (
+        err?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("exceeds balance")
+      ) {
+        throw new CustomError(
+          "Insufficient Funds Error",
+          "Your balance is not enough to make this transaction",
+          500
+        );
+      } else if (err.message.includes("too many decimal")) {
+        throw new CustomError(
+          "Small Amount Error",
+          "The amount is too small to make this transaction",
+          500
+        );
       } else {
-        throw new CustomError("Blockchain JS Error", err.message, 500);
+        throw new CustomError(
+          "Blockchain JS Error",
+          err?.message || err?.error?.message,
+          500
+        );
       }
     }
   };
@@ -240,17 +273,36 @@ class EthereumService {
         await tx.wait();
 
         if (tx.from === from) return tx.hash;
-      }
-      return false;
-    } catch (err: any) {
-      if (err.message.includes("insufficient funds")) {
+      } else {
         throw new CustomError(
           "Insufficient Funds Error",
           "Your balance is not enough to make this transaction",
           500
         );
+      }
+    } catch (err: any) {
+      if (
+        err?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("exceeds balance")
+      ) {
+        throw new CustomError(
+          "Insufficient Funds Error",
+          "Your balance is not enough to make this transaction",
+          500
+        );
+      } else if (err.message.includes("too many decimal")) {
+        throw new CustomError(
+          "Small Amount Error",
+          "The amount is too small to make this transaction",
+          500
+        );
       } else {
-        throw new CustomError("Blockchain JS Error", err.message, 500);
+        throw new CustomError(
+          "Blockchain JS Error",
+          err?.message || err?.error?.message,
+          500
+        );
       }
     }
   };

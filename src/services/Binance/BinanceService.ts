@@ -179,14 +179,22 @@ class BinanceService {
         return receipt?.hash;
       return false;
     } catch (err: any) {
-      if (err.message.includes("insufficient funds")) {
+      if (
+        err?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("insufficient funds") ||
+        err?.error?.message?.includes("exceeds balance")
+      ) {
         throw new CustomError(
           "Insufficient Funds Error",
           "Your balance is not enough to make this transaction",
           500
         );
       } else {
-        throw new CustomError("Blockchain JS Error", err.message, 500);
+        throw new CustomError(
+          "Blockchain JS Error",
+          err?.message || err?.error?.message,
+          500
+        );
       }
     }
   };
