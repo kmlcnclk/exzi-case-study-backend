@@ -1,6 +1,6 @@
 # Cryptocurrency Trading System API For EXZI
 
-This document outlines the APIs provided by our cryptocurrency trading system, which supports Binance and Ethereum networks. The system supports the following tokens: USDT, USDC, ETH, and BNB.
+This document outlines the APIs provided by our cryptocurrency trading system, which supports Binance and Ethereum networks. The system supports the following tokens: USDT, USDC, ETH, and BNB. Go to [EXZI Frontend](https://github.com/kmlcnclk/exzi-case-study-frontend/)
 
 ## User Management
 
@@ -26,7 +26,7 @@ Allows the user to successfully register to the system.
 - `name` (string): The user's name.
 - `email` (string): The user's email.
 - `password` (string): The user's password.
-- `confirmationPassword` (string): Confirmation of the user's password.
+- `passwordConfirmation` (string): Confirmation of the user's password.
 
 ### Get User By ID
 
@@ -124,5 +124,58 @@ The system supports the following networks and tokens:
   - ETH
 
 ---
+
+## Used Technologies
+
+- Typescript
+- Javascript
+- Express.js
+- Zod
+- Ethers
+- Web3.js
+- Helmet
+- Mongo DB
+- Cors
+- Uniswap SDK
+- Truffle
+- Openzeppelin Contracts
+- Node RSA
+- Json Web Token
+- Bcrypt
+- Lodash
+- Winston
+- UUID
+- Supertest
+- Jest
+
+
+## Node Version
+
+The system is built using Node version v20.11.1.
+
+
+## Installation
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/kmlcnclk/exzi-case-study-backend.git
+    ```
+2. Install dependencies:
+    ```bash
+    cd crypto-transaction-system
+    npm install
+    ```
+3. Run the application:
+    ```bash
+    npm run dev
+    ```
+
+## Contributing
+
+Feel free to submit issues or pull requests for improvements and bug fixes.
+
+## License
+
+This project is licensed under the MIT License.
 
 This documentation provides a comprehensive guide to using the APIs within our cryptocurrency trading system. For further details or support, please refer to the project's GitHub repository.
