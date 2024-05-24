@@ -116,7 +116,7 @@ class BinanceService {
 
     let result: string | boolean | Bytes = false;
 
-    if (token === "tether") {
+    if (token === "usdt") {
       if (NODE_ENV === "production") {
         result = await this.withdrawForUSDTOnBinance(
           amount,
@@ -138,7 +138,7 @@ class BinanceService {
       } else {
         return "0x";
       }
-    } else if (token === "ethereum") {
+    } else if (token === "eth") {
       if (NODE_ENV === "production") {
         result = await this.withdrawForETHOnBinance(
           amount,

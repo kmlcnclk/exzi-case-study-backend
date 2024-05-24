@@ -3,7 +3,7 @@ import { checkJwtAndUserExist } from "../middlewares/Jwt";
 import TradeController from "../controllers/tradeController";
 import UserDAO from "../data/UserDAO";
 import validate from "../middlewares/validateResource";
-import { buyTradeSchema } from "../schemas/tradeSchema";
+import { buyAndSellTradeSchema } from "../schemas/tradeSchema";
 
 class TradeRouter {
   tradeRouter: Router;
@@ -16,24 +16,15 @@ class TradeRouter {
   }
 
   routes() {
-    this.buy();
-    this.sell();
+    this.buyAndSell();
     this.history();
   }
 
-  buy() {
+  buyAndSell() {
     this.tradeRouter.post(
-      "/buy",
-      [validate(buyTradeSchema), checkJwtAndUserExist(UserDAO)],
-      this.tradeController.buy
-    );
-  }
-
-  sell() {
-    this.tradeRouter.post(
-      "/sell",
-      [checkJwtAndUserExist(UserDAO)],
-      this.tradeController.sell
+      "/buy-and-sell",
+      [validate(buyAndSellTradeSchema), checkJwtAndUserExist(UserDAO)],
+      this.tradeController.buyAndSell
     );
   }
 

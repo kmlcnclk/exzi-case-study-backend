@@ -70,16 +70,14 @@ class WalletController {
         (await this.walletService.findWalletByUserId(
           get(req.user, "_id") as string
         )) as WalletDocument;
-      console.log(1);
+
       if (!wallet)
         throw next(new CustomError("Not Found", "Wallet not found", 404));
-      console.log(1);
 
       const privateDecrypt =
         await this.walletService.decryptHashedWalletPrivateKey(
           wallet.privateKey
         );
-      console.log(1);
 
       const result = await this.walletService.withdraw(
         amount,
@@ -89,7 +87,6 @@ class WalletController {
         network,
         token
       );
-      console.log(amount, privateDecrypt, to, wallet.address, network, token);
 
       if (
         result === "0x" ||

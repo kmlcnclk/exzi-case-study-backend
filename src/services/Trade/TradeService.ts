@@ -1,17 +1,22 @@
 import TradeHistoryDAO from "../../data/TradeHistoryDAO";
-import CustomError from "../../helpers/errors/CustomError";
 import { TradeHistoryDocument } from "../../models/tradeHistoryModel";
 import { WalletDocument } from "../../models/walletModel";
+import BinanceService from "../Binance/BinanceService";
 import EthereumService from "../Ethereum/EthereumService";
+import SwapService from "../Swap/SwapService";
 import WalletService from "../Wallet/WalletService";
 
 class TradeService {
   ethereumService: EthereumService;
+  binanceService: BinanceService;
   walletService: WalletService;
+  swapService: SwapService;
 
   constructor() {
     this.ethereumService = new EthereumService();
     this.walletService = new WalletService();
+    this.binanceService = new BinanceService();
+    this.swapService = new SwapService();
   }
 
   findTradeHistoriesByUserId = async (
@@ -23,23 +28,6 @@ class TradeService {
       })) as TradeHistoryDocument[];
 
     return tradeHistories;
-  };
-
-  buy = async (value: string, tokens: string[], userId: string) => {
-    const wallet = await this.walletService.findWalletByUserId(userId);
-
-    if (!wallet) throw new CustomError("Not Found", "Wallet not found", 404);
-
-    const decryptedPrivateKey =
-      await this.walletService.decryptHashedWalletPrivateKey(
-        wallet?.privateKey
-      );
-
-    return await this.ethereumService.buyCoin(
-      "39741f8a04a7d4fa71b22193a520ab137885bdb280eafcb1195b6d8750b4e3b8",
-      value,
-      tokens
-    );
   };
 
   createBuyTradeHistory = async (
@@ -58,12 +46,33 @@ class TradeService {
       tx,
       user: userID,
       wallet: walletID,
-      status: "buy",
     });
   };
 
   findWalletByUserId = (userId: string): Promise<WalletDocument | null> => {
     return this.walletService.findWalletByUserId(userId);
+  };
+
+  buyAndSellCoin = async (
+    userID: string,
+    amount: string,
+    tokens: string[],
+    network: string
+  ): Promise<string | undefined | object> => {
+    const wallet = await this.walletService.findWalletByUserId(userID);
+
+    const privateKey = await this.walletService.decryptHashedWalletPrivateKey(
+      wallet?.privateKey as string
+    );
+
+    const receipt = await this.swapService.buyAndSellCoin(
+      privateKey,
+      amount,
+      tokens,
+      network
+    );
+
+    return receipt;
   };
 }
 

@@ -16,7 +16,6 @@ const tradeHistorySchema = new mongoose.Schema(
     amount: { type: Number, required: true },
     fromCoin: { type: String, required: true },
     toCoin: { type: String, required: true },
-    status: { type: String, required: true, enum: ["buy", "sell"] },
     network: { type: String, required: true },
   },
   {

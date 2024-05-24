@@ -8,7 +8,6 @@ export interface ITradeHistory {
   amount: number;
   fromCoin: string;
   toCoin: string;
-  status: string;
   network: string;
 }
 

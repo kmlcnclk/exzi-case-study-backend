@@ -12,7 +12,11 @@ class TradeController {
     this.tradeService = new TradeService();
   }
 
-  buy = async (req: RequestWithUser, res: Response, next: NextFunction) => {
+  buyAndSell = async (
+    req: RequestWithUser,
+    res: Response,
+    next: NextFunction
+  ) => {
     try {
       const { amount, tokens, network } = req.body;
 
@@ -23,10 +27,11 @@ class TradeController {
       if (!wallet)
         throw next(new CustomError("Not Found", "Wallet not found", 404));
 
-      const receipt = await this.tradeService.buy(
+      const receipt = await this.tradeService.buyAndSellCoin(
+        get(req.user, "_id") as string,
         amount,
         tokens,
-        get(req.user, "_id") as string
+        network
       );
 
       if (!receipt)
@@ -38,26 +43,14 @@ class TradeController {
         amount,
         get(req.user, "_id") as string,
         wallet?._id as string,
-        receipt?.hash,
+        receipt as string,
         tokens,
-        "ethereum"
+        network
       );
 
       logger.info("Trade successfully happened");
 
       return res.status(200).json({ message: "Trade successfully happened" });
-    } catch (err: any) {
-      logger.error({
-        status: 500,
-        name: err.name,
-        message: err.message,
-      });
-      return res.status(500).json({ error: err.message });
-    }
-  };
-
-  sell = async (req: RequestWithUser, res: Response) => {
-    try {
     } catch (err: any) {
       logger.error({
         status: 500,

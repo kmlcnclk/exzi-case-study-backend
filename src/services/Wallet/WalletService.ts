@@ -127,7 +127,7 @@ class WalletService {
     token: string
   ): Promise<string | boolean | Bytes | undefined> => {
     let result;
-    if (network === "ethereum") {
+    if (network === "eth") {
       result = this.ethereumService.withdrawForEthereum(
         amount,
         privateKey,

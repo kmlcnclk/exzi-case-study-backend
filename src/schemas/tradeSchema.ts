@@ -1,6 +1,6 @@
 import { array, object, string } from "zod";
 
-export const buyTradeSchema = object({
+export const buyAndSellTradeSchema = object({
   body: object({
     tokens: array(
       string({
