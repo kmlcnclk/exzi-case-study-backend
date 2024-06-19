@@ -76,7 +76,7 @@ web_modules/
 
 # dotenv environment variable files
 
-.rsa_key.pem
+rsa_key.pem
 .env
 .env.development.local
 .env.test.local
